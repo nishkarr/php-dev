@@ -6,13 +6,16 @@ RUN set -eux; \
         ca-certificates curl gnupg libzip-dev unzip libpng-dev libpq-dev
 
 # pdo_pgsql is the missing link
-RUN docker-php-ext-install zip gd pgsql pdo_pgsql sysvsem
+RUN docker-php-ext-install zip gd pgsql pdo_pgsql sysvsem pdo_mysql
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"  \
         && php composer-setup.php \
         && php -r "unlink('composer-setup.php');" \
         && chmod +x composer.phar && mv composer.phar /usr/local/bin/composer \
         && echo "memory_limit = 256M" > /usr/local/etc/php/conf.d/php-memory-limit.ini
+
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | bash \
+        && apt install -y symfony-cli
 
 RUN mkdir -p /etc/apt/keyrings \
         && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
